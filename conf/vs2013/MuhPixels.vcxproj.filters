@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\src\GUI\ImageViewer.cpp" />
+    <ClCompile Include="..\..\src\GUI\main.cpp" />
+    <ClCompile Include="..\..\src\GUI\moc_ImageViewer.qt.cpp">
+      <Filter>moc</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\GUI\ImageViewer.qt.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="moc">
+      <UniqueIdentifier>{fc1b7f27-8d4a-4945-94d7-a7814717f8c0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

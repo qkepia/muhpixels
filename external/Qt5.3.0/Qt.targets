@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<ItemGroup>
+		<QtHeaders Include="$(SolutionDir)..\..\src\**\*.qt.h"/>
+	</ItemGroup>
+	<Target BeforeTargets="ClCompile" Inputs="@(QtHeaders)" Name="QtMoc" Outputs="@(QtHeaders-&gt;'%(RootDir)%(Directory)moc_%(Filename).cpp')">
+		<Message Text="MOC: %(QtHeaders.FullPath)"/>
+		<Exec Command="$(Moc) %(QtHeaders.FullPath) -o %(QtHeaders.RootDir)%(QtHeaders.Directory)moc_%(QtHeaders.Filename).cpp"/>
+	</Target>
+</Project>
