@@ -38,9 +38,7 @@
     <Import Project="..\vpx.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
-    <ExecutablePath>C:\my\code\qkepia\muhpixels\external\libvpx-v1.3.0\tools;$(ExecutablePath)</ExecutablePath>
-  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
     <PreBuildEvent>

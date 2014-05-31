@@ -3,7 +3,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <ExecutablePath>$(SolutionDir)..\..\external\yasm-1.2.0;$(ExecutablePath)</ExecutablePath>
+    <ExecutablePath>$(SolutionDir)bin\$(Configuration)\;$(SolutionDir)..\..\external\yasm-1.2.0;$(ExecutablePath)</ExecutablePath>
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)temp\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
