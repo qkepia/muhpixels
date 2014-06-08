@@ -59,6 +59,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -74,6 +75,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -83,12 +85,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\GUI\ImageViewer.cpp" />
     <ClCompile Include="..\..\src\GUI\main.cpp" />
-    <ClCompile Include="..\..\src\GUI\moc_ImageViewer.qt.cpp" />
+    <ClCompile Include="..\..\src\GUI\MainWindow.cpp" />
+    <ClCompile Include="..\..\src\GUI\moc_MainWindow.qt.cpp" />
+    <ClCompile Include="..\..\src\GUI\moc_RawFileMap.qt.cpp" />
+    <ClCompile Include="..\..\src\GUI\RawFileMap.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\GUI\ImageViewer.qt.h" />
+    <ClInclude Include="..\..\src\GUI\MainWindow.qt.h" />
+    <ClInclude Include="..\..\src\GUI\RawFileMap.qt.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
