@@ -1,0 +1,34 @@
+//-----------------------------------------------------------------------------------------------// 
+// FrameView.cpp
+//-----------------------------------------------------------------------------------------------// 
+#include <QtWidgets>
+#include <GUI/FrameView.qt.h>
+
+using namespace mpx::GUI;
+
+//-----------------------------------------------------------------------------------------------// 
+
+FrameView::FrameView(QWidget* pParent)
+	: QGraphicsView(pParent)
+{
+	m_pGraphicsScene = new QGraphicsScene();
+	setScene(m_pGraphicsScene);
+
+#if 0
+    QString fileName("S:\\test.png");
+	QImage image(fileName);
+    if(image.isNull())
+	{
+        QMessageBox::information(this, tr("MUH PIXELS"),
+                                    tr("Cannot load %1.").arg(fileName));
+    }
+	else
+	{
+		QPixmap pixmap = QPixmap::fromImage(image);
+		QGraphicsPixmapItem* pPixmapItem = new QGraphicsPixmapItem(pixmap);
+		m_pGraphicsScene->addItem(pPixmapItem);
+	}
+#endif
+
+	show();
+}

@@ -10,10 +10,15 @@
     <ClCompile Include="..\..\src\GUI\moc_MainWindow.qt.cpp">
       <Filter>moc</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\GUI\FrameView.cpp" />
+    <ClCompile Include="..\..\src\GUI\moc_FrameView.qt.cpp">
+      <Filter>moc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\GUI\RawFileMap.qt.h" />
     <ClInclude Include="..\..\src\GUI\MainWindow.qt.h" />
+    <ClInclude Include="..\..\src\GUI\FrameView.qt.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="moc">

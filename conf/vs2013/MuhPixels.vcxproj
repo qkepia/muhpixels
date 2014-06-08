@@ -85,13 +85,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\GUI\FrameView.cpp" />
     <ClCompile Include="..\..\src\GUI\main.cpp" />
     <ClCompile Include="..\..\src\GUI\MainWindow.cpp" />
+    <ClCompile Include="..\..\src\GUI\moc_FrameView.qt.cpp" />
     <ClCompile Include="..\..\src\GUI\moc_MainWindow.qt.cpp" />
     <ClCompile Include="..\..\src\GUI\moc_RawFileMap.qt.cpp" />
     <ClCompile Include="..\..\src\GUI\RawFileMap.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\GUI\FrameView.qt.h" />
     <ClInclude Include="..\..\src\GUI\MainWindow.qt.h" />
     <ClInclude Include="..\..\src\GUI\RawFileMap.qt.h" />
   </ItemGroup>

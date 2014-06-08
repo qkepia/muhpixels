@@ -2,6 +2,7 @@
 // MainWindow.cpp
 //-----------------------------------------------------------------------------------------------// 
 #include <QtWidgets>
+#include <GUI/FrameView.qt.h>
 #include <GUI/MainWindow.qt.h>
 #include <GUI/RawFileMap.qt.h>
 
@@ -11,16 +12,9 @@ using namespace mpx::GUI;
 
 MainWindow::MainWindow()
 {
-	// Setup image label as the central widget.
-	m_pImageLabel = new QLabel;
-	m_pImageLabel->setBackgroundRole(QPalette::Base);
-	m_pImageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-	m_pImageLabel->setScaledContents(true);
-
-	m_pScrollArea = new QScrollArea;
-	m_pScrollArea->setBackgroundRole(QPalette::Dark);
-	m_pScrollArea->setWidget(m_pImageLabel);
-	setCentralWidget(m_pScrollArea);
+	// Setup the central widget.
+	m_pFrameView = new FrameView(this);
+	setCentralWidget(m_pFrameView);
 
 	createActions();
 	createMenus();
@@ -29,8 +23,8 @@ MainWindow::MainWindow()
 	QDockWidget* pDock = new QDockWidget(tr("Raw File Map"), this);
 	pDock->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
 	addDockWidget(Qt::BottomDockWidgetArea, pDock);
-	RawFileMap* pRawFileMap = new RawFileMap();	
-	pDock->setWidget(pRawFileMap);
+	m_pRawFileMap = new RawFileMap();	
+	pDock->setWidget(m_pRawFileMap);
 
 	setWindowTitle(tr("MUH PIXELS"));
 	resize(1280, 720);
@@ -49,14 +43,15 @@ void MainWindow::open()
                                      tr("Cannot load %1.").arg(fileName));
             return;
         }
-        m_pImageLabel->setPixmap(QPixmap::fromImage(image));
+
+        //m_pImageLabel->setPixmap(QPixmap::fromImage(image));
         m_scaleFactor = 1.0;
 
         m_pFitToWindowAct->setEnabled(true);
         updateActions();
 
-        if (!m_pFitToWindowAct->isChecked())
-            m_pImageLabel->adjustSize();
+        //if (!m_pFitToWindowAct->isChecked())
+        //    m_pImageLabel->adjustSize();
     }
 }
 
@@ -78,7 +73,7 @@ void MainWindow::zoomOut()
 
 void MainWindow::normalSize()
 {
-    m_pImageLabel->adjustSize();
+    //m_pImageLabel->adjustSize();
     m_scaleFactor = 1.0;
 }
 
@@ -86,12 +81,12 @@ void MainWindow::normalSize()
 
 void MainWindow::fitToWindow()
 {
-    bool fitToWindow = m_pFitToWindowAct->isChecked();
-    m_pScrollArea->setWidgetResizable(fitToWindow);
-    if (!fitToWindow) {
-        normalSize();
-    }
-    updateActions();
+    //bool fitToWindow = m_pFitToWindowAct->isChecked();
+    //m_pScrollArea->setWidgetResizable(fitToWindow);
+    //if (!fitToWindow) {
+    //    normalSize();
+    //}
+    //updateActions();
 }
 
 //-----------------------------------------------------------------------------------------------// 
@@ -178,12 +173,12 @@ void MainWindow::updateActions()
 
 void MainWindow::scaleImage(double factor)
 {
-    Q_ASSERT(m_pImageLabel->pixmap());
+    //Q_ASSERT(m_pImageLabel->pixmap());
     m_scaleFactor *= factor;
-    m_pImageLabel->resize(m_scaleFactor * m_pImageLabel->pixmap()->size());
+ 	//m_pImageLabel->resize(m_scaleFactor * m_pImageLabel->pixmap()->size());
 
-    adjustScrollBar(m_pScrollArea->horizontalScrollBar(), factor);
-    adjustScrollBar(m_pScrollArea->verticalScrollBar(), factor);
+    //adjustScrollBar(m_pScrollArea->horizontalScrollBar(), factor);
+    //adjustScrollBar(m_pScrollArea->verticalScrollBar(), factor);
 
     m_pZoomInAct->setEnabled(m_scaleFactor < 3.0);
     m_pZoomOutAct->setEnabled(m_scaleFactor > 0.333);

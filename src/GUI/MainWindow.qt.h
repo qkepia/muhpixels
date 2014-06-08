@@ -16,6 +16,9 @@ QT_END_NAMESPACE
 
 namespace mpx { namespace GUI {
 
+class FrameView;
+class RawFileMap;
+
 //-----------------------------------------------------------------------------------------------// 
 // Main application window.
 //-----------------------------------------------------------------------------------------------// 
@@ -41,9 +44,10 @@ private:
     void scaleImage(double factor);
     void adjustScrollBar(QScrollBar* scrollBar, double factor);
 
-    QLabel* m_pImageLabel;
-    QScrollArea* m_pScrollArea;
-    double m_scaleFactor;
+	FrameView* m_pFrameView;
+	RawFileMap* m_pRawFileMap;
+	
+	double m_scaleFactor;
 
     QAction* m_pOpenAct;
     QAction* m_pExitAct;
