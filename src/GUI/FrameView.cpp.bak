@@ -14,7 +14,7 @@ FrameView::FrameView(QWidget* pParent)
 	m_pGraphicsScene = new QGraphicsScene();
 	setScene(m_pGraphicsScene);
 
-#if 0
+#if 1
     QString fileName("S:\\test.png");
 	QImage image(fileName);
     if(image.isNull())

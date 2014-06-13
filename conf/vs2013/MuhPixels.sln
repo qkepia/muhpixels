@@ -43,6 +43,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vpxdec", "..\..\external\vp
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vpxenc", "..\..\external\vpx\build-vs2013\vpxenc.vcxproj", "{548DEC74-7A15-4B2B-AFC3-AA102E7C25C1}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Model", "Model.vcxproj", "{097305AE-68BE-4CEC-95F4-1F0B5C744BF0}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Base", "Base.vcxproj", "{4520EB8B-3841-48B2-9174-D3429EF2F12C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Analyze", "Analyze.vcxproj", "{62DB2BD9-D430-4D03-AB8B-EDF1C7E016CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug|x64 = debug|x64
@@ -125,6 +131,18 @@ Global
 		{548DEC74-7A15-4B2B-AFC3-AA102E7C25C1}.debug|x64.Build.0 = debug|x64
 		{548DEC74-7A15-4B2B-AFC3-AA102E7C25C1}.release|x64.ActiveCfg = release|x64
 		{548DEC74-7A15-4B2B-AFC3-AA102E7C25C1}.release|x64.Build.0 = release|x64
+		{097305AE-68BE-4CEC-95F4-1F0B5C744BF0}.debug|x64.ActiveCfg = debug|x64
+		{097305AE-68BE-4CEC-95F4-1F0B5C744BF0}.debug|x64.Build.0 = debug|x64
+		{097305AE-68BE-4CEC-95F4-1F0B5C744BF0}.release|x64.ActiveCfg = release|x64
+		{097305AE-68BE-4CEC-95F4-1F0B5C744BF0}.release|x64.Build.0 = release|x64
+		{4520EB8B-3841-48B2-9174-D3429EF2F12C}.debug|x64.ActiveCfg = debug|x64
+		{4520EB8B-3841-48B2-9174-D3429EF2F12C}.debug|x64.Build.0 = debug|x64
+		{4520EB8B-3841-48B2-9174-D3429EF2F12C}.release|x64.ActiveCfg = release|x64
+		{4520EB8B-3841-48B2-9174-D3429EF2F12C}.release|x64.Build.0 = release|x64
+		{62DB2BD9-D430-4D03-AB8B-EDF1C7E016CF}.debug|x64.ActiveCfg = debug|x64
+		{62DB2BD9-D430-4D03-AB8B-EDF1C7E016CF}.debug|x64.Build.0 = debug|x64
+		{62DB2BD9-D430-4D03-AB8B-EDF1C7E016CF}.release|x64.ActiveCfg = release|x64
+		{62DB2BD9-D430-4D03-AB8B-EDF1C7E016CF}.release|x64.Build.0 = release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

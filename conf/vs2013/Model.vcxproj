@@ -11,12 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{7149C083-FC54-4D26-B95C-5947B694BABA}</ProjectGuid>
-    <RootNamespace>MuhPixels</RootNamespace>
+    <ProjectGuid>{097305AE-68BE-4CEC-95F4-1F0B5C744BF0}</ProjectGuid>
+    <RootNamespace>Model</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -33,23 +33,19 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\external\Qt5.3.0\Qt.props" />
-    <Import Project="..\..\external\vpx\vpx.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\external\Qt5.3.0\Qt.props" />
-    <Import Project="..\..\external\vpx\vpx.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)lib\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)temp\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)lib\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)temp\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
@@ -85,32 +81,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\GUI\FrameView.cpp" />
-    <ClCompile Include="..\..\src\GUI\main.cpp" />
-    <ClCompile Include="..\..\src\GUI\MainWindow.cpp" />
-    <ClCompile Include="..\..\src\GUI\moc_FrameView.qt.cpp" />
-    <ClCompile Include="..\..\src\GUI\moc_MainWindow.qt.cpp" />
-    <ClCompile Include="..\..\src\GUI\moc_RawFileMap.qt.cpp" />
-    <ClCompile Include="..\..\src\GUI\RawFileMap.cpp" />
+    <ClCompile Include="..\..\src\Model\BitStream.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\GUI\FrameView.qt.h" />
-    <ClInclude Include="..\..\src\GUI\MainWindow.qt.h" />
-    <ClInclude Include="..\..\src\GUI\RawFileMap.qt.h" />
+    <ClInclude Include="..\..\src\Model\BitStream.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Analyze.vcxproj">
-      <Project>{62db2bd9-d430-4d03-ab8b-edf1c7e016cf}</Project>
-    </ProjectReference>
     <ProjectReference Include="Base.vcxproj">
       <Project>{4520eb8b-3841-48b2-9174-d3429ef2f12c}</Project>
-    </ProjectReference>
-    <ProjectReference Include="Model.vcxproj">
-      <Project>{097305ae-68be-4cec-95f4-1f0b5c744bf0}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\..\external\Qt5.3.0\Qt.targets" />
   </ImportGroup>
 </Project>

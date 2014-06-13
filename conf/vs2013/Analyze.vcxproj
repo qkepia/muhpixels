@@ -11,12 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{7149C083-FC54-4D26-B95C-5947B694BABA}</ProjectGuid>
-    <RootNamespace>MuhPixels</RootNamespace>
+    <ProjectGuid>{62DB2BD9-D430-4D03-AB8B-EDF1C7E016CF}</ProjectGuid>
+    <RootNamespace>Analyze</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -33,23 +33,21 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\external\Qt5.3.0\Qt.props" />
     <Import Project="..\..\external\vpx\vpx.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\external\Qt5.3.0\Qt.props" />
     <Import Project="..\..\external\vpx\vpx.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)lib\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)temp\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)lib\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)temp\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
@@ -59,7 +57,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\src\;$(SolutionDir)..\..\external\vpx\libvpx-v1.3.0;$(SolutionDir)..\..\external\vpx\build-vs2013;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -75,7 +73,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\src\;$(SolutionDir)..\..\external\vpx\libvpx-v1.3.0;$(SolutionDir)..\..\external\vpx\build-vs2013;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -85,32 +83,53 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\GUI\FrameView.cpp" />
-    <ClCompile Include="..\..\src\GUI\main.cpp" />
-    <ClCompile Include="..\..\src\GUI\MainWindow.cpp" />
-    <ClCompile Include="..\..\src\GUI\moc_FrameView.qt.cpp" />
-    <ClCompile Include="..\..\src\GUI\moc_MainWindow.qt.cpp" />
-    <ClCompile Include="..\..\src\GUI\moc_RawFileMap.qt.cpp" />
-    <ClCompile Include="..\..\src\GUI\RawFileMap.cpp" />
+    <ClCompile Include="..\..\external\vpx\libvpx-v1.3.0\nestegg\halloc\src\halloc.c" />
+    <ClCompile Include="..\..\external\vpx\libvpx-v1.3.0\nestegg\src\nestegg.c" />
+    <ClCompile Include="..\..\src\Analyze\Decode.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\GUI\FrameView.qt.h" />
-    <ClInclude Include="..\..\src\GUI\MainWindow.qt.h" />
-    <ClInclude Include="..\..\src\GUI\RawFileMap.qt.h" />
+    <ClInclude Include="..\..\external\vpx\libvpx-v1.3.0\nestegg\halloc\halloc.h" />
+    <ClInclude Include="..\..\external\vpx\libvpx-v1.3.0\nestegg\halloc\src\align.h" />
+    <ClInclude Include="..\..\external\vpx\libvpx-v1.3.0\nestegg\halloc\src\hlist.h" />
+    <ClInclude Include="..\..\external\vpx\libvpx-v1.3.0\nestegg\halloc\src\macros.h" />
+    <ClInclude Include="..\..\external\vpx\libvpx-v1.3.0\nestegg\include\nestegg\nestegg.h" />
+    <ClInclude Include="..\..\src\Analyze\Decode.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Analyze.vcxproj">
-      <Project>{62db2bd9-d430-4d03-ab8b-edf1c7e016cf}</Project>
+    <ProjectReference Include="..\..\external\vpx\build-vs2013\vpx.vcxproj">
+      <Project>{dce19daf-69ac-46db-b14a-39f0faa5db74}</Project>
+      <Private>false</Private>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
+    <ProjectReference Include="..\..\external\vpx\build-vs2013\vpxdec.vcxproj">
+      <Project>{ba5fe66f-38dd-e034-f542-b1578c5fb950}</Project>
+      <Private>false</Private>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
     <ProjectReference Include="Base.vcxproj">
       <Project>{4520eb8b-3841-48b2-9174-d3429ef2f12c}</Project>
+      <Private>false</Private>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
     <ProjectReference Include="Model.vcxproj">
       <Project>{097305ae-68be-4cec-95f4-1f0b5c744bf0}</Project>
+      <Private>false</Private>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\..\external\Qt5.3.0\Qt.targets" />
   </ImportGroup>
 </Project>

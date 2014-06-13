@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\src\Analyze\Decode.cpp" />
+    <ClCompile Include="..\..\external\vpx\libvpx-v1.3.0\nestegg\src\nestegg.c">
+      <Filter>nestegg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\vpx\libvpx-v1.3.0\nestegg\halloc\src\halloc.c">
+      <Filter>nestegg</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\Analyze\Decode.h" />
+    <ClInclude Include="..\..\external\vpx\libvpx-v1.3.0\nestegg\include\nestegg\nestegg.h">
+      <Filter>nestegg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\external\vpx\libvpx-v1.3.0\nestegg\halloc\halloc.h">
+      <Filter>nestegg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\external\vpx\libvpx-v1.3.0\nestegg\halloc\src\align.h">
+      <Filter>nestegg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\external\vpx\libvpx-v1.3.0\nestegg\halloc\src\hlist.h">
+      <Filter>nestegg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\external\vpx\libvpx-v1.3.0\nestegg\halloc\src\macros.h">
+      <Filter>nestegg</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="nestegg">
+      <UniqueIdentifier>{99c62725-efe4-42a9-b1de-b496f6f7e67c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

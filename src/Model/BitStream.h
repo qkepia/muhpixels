@@ -1,32 +1,21 @@
 //-----------------------------------------------------------------------------------------------// 
-// RawFileMap.qt.h
+// BitStream.h
 //-----------------------------------------------------------------------------------------------// 
-#ifndef MPX_GUI_RAW_FILE_MAP_H
-#define MPX_GUI_RAW_FILE_MAP_H
+#ifndef MPX_MODEL_BIT_STREAM_H
+#define MPX_MODEL_BIT_STREAM_H
 
-#include <QWidget>
-
-namespace mpx { namespace GUI {
+namespace mpx { namespace Model {
 
 //-----------------------------------------------------------------------------------------------// 
-// Representation of the raw file data.
+// Bitstream infos.
 //-----------------------------------------------------------------------------------------------// 
-class RawFileMap : public QWidget
+struct BitStreamInfo
 {
-    Q_OBJECT
 
-public:
-	RawFileMap(QWidget* pParent = nullptr);
 
-    void paintEvent(QPaintEvent* pEvent) override;
-    void mouseMoveEvent(QMouseEvent* pEvent) override;
-    void resizeEvent(QResizeEvent* pEvent) override;
-
-private:
-	
 };
 
-}} // mpx::GUI
+}} // mpx::Model
 
 //-----------------------------------------------------------------------------------------------// 
 

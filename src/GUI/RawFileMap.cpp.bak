@@ -38,6 +38,22 @@ void RawFileMap::paintEvent(QPaintEvent*)
 		rect.setLeft(rect.left() + margin + barWidth);
 		rect.setRight(rect.right() + margin + barWidth);
 	}
+
+ //   int y = height() - margin* 2;
+ //   QFontMetrics fm(painter.font());
+ //   int x_lbl = margin+barwidth/2;
+ //   for(size_t i=0, s = values.size(); i < s; ++i)
+ //   {
+ //       painter.drawRect(bars[i]);
+ //       if(show_label)
+ //           painter.drawText(x_lbl-fm.width(getLabel(i))/2,y,getLabel(i));
+ //       int min = cut_min_value ? min_val : 0;//if cut off, we'll need to add this value here again for correct display
+ //       QString lbl = "("+QString::number(values[i]+min)+")";
+ //       painter.drawText(x_lbl-fm.width(lbl)/2,y+fm.height(),lbl);
+ //       x_lbl += margin+barwidth;
+ //   }
+
+	//pEvent;
 }
 
 //-----------------------------------------------------------------------------------------------// 

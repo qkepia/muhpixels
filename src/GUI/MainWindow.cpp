@@ -5,6 +5,8 @@
 #include <GUI/FrameView.qt.h>
 #include <GUI/MainWindow.qt.h>
 #include <GUI/RawFileMap.qt.h>
+#include <Model/BitStream.h>
+#include <Analyze/Decode.h>
 
 using namespace mpx::GUI;
 
@@ -23,11 +25,14 @@ MainWindow::MainWindow()
 	QDockWidget* pDock = new QDockWidget(tr("Raw File Map"), this);
 	pDock->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
 	addDockWidget(Qt::BottomDockWidgetArea, pDock);
-	m_pRawFileMap = new RawFileMap();	
+	m_pRawFileMap = new RawFileMap(this);	
 	pDock->setWidget(m_pRawFileMap);
 
 	setWindowTitle(tr("MUH PIXELS"));
 	resize(1280, 720);
+
+	Model::BitStreamInfo bsInfo;
+	Analyze::modelBitStream("S:\\my\\data\\knk-vp9.webm", bsInfo);
 }
 
 //-----------------------------------------------------------------------------------------------// 
