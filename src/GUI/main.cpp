@@ -3,14 +3,14 @@
 //-----------------------------------------------------------------------------------------------// 
 
 #include <QApplication>
-#include <GUI/MainWindow.qt.h>
+#include <MainWindow.qt.h>
 
 //-----------------------------------------------------------------------------------------------// 
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    mpx::GUI::MainWindow mpxWindow;
+    mpx::MainWindow mpxWindow;
     mpxWindow.show();
     return app.exec();
 }

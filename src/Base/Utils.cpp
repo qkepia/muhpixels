@@ -2,14 +2,14 @@
 // Utils.cpp
 //-----------------------------------------------------------------------------------------------// 
 
-#include <Base/Utils.h>
+#include <Utils.h>
 #include <stdarg.h>
 #include <memory>
 #include <cstdlib>
 
 #pragma warning (disable: 4996) // shut up about strcpy
 
-namespace mpx { namespace Base {
+namespace mpx {
 
 //-----------------------------------------------------------------------------------------------// 
 // printf to std::string
@@ -62,4 +62,4 @@ std::string sprint(const char* pFormat, ...)
 
 //-----------------------------------------------------------------------------------------------// 
 
-}} // mpx::Base
+} // mpx

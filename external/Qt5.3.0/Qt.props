@@ -9,7 +9,7 @@
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\external\Qt5.3.0\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 	</Link>      
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>_WINDOWS;UNICODE;WIN32;WIN64;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -17,7 +17,7 @@
       <AdditionalDependencies>glu32.lib;opengl32.lib;qtmaind.lib;Qt5Widgetsd.lib;Qt5Guid.lib;Qt5Cored.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>      
   </ItemDefinitionGroup>  
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
     <ClCompile>
       <PreprocessorDefinitions>_WINDOWS;UNICODE;WIN32;WIN64;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -25,10 +25,10 @@
       <AdditionalDependencies>glu32.lib;opengl32.lib;gdi32.lib;user32.lib;qtmain.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>      
   </ItemDefinitionGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
     <Moc>$(SolutionDir)..\..\external\Qt5.3.0\bin\moc.exe -DUNICODE -DWIN32 -DWIN64 -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -D_MSC_VER=1800 -D_WIN32 -D_WIN64 -I"$(SolutionDir)..\..\external\Qt5.3.0\include" -I"$(SolutionDir)..\..\external\Qt5.3.0\include\QtWidgets" -I"$(SolutionDir)..\..\external\Qt5.3.0\include\QtGui" -I"$(SolutionDir)..\..\external\Qt5.3.0\include\QtCore" -I"debug" -I$(SolutionDir)..\..\external\Qt5.3.0\mkspecs\win32-msvc2013</Moc>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
     <Moc>$(SolutionDir)..\..\external\Qt5.3.0\bin\moc.exe -DUNICODE -DWIN32 -DWIN64 -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -D_MSC_VER=1800 -D_WIN32 -D_WIN64 -I"$(SolutionDir)..\..\external\Qt5.3.0\include" -I"$(SolutionDir)..\..\external\Qt5.3.0\include\QtWidgets" -I"$(SolutionDir)..\..\external\Qt5.3.0\include\QtGui" -I"$(SolutionDir)..\..\external\Qt5.3.0\include\QtCore" -I"release" -I$(SolutionDir)..\..\external\Qt5.3.0\mkspecs\win32-msvc2013</Moc>
   </PropertyGroup>
 </Project>

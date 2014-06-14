@@ -1,29 +1,19 @@
 //-----------------------------------------------------------------------------------------------// 
-// FrameView.qt.h
+// Vec.h
 //-----------------------------------------------------------------------------------------------// 
-#ifndef MPX_GUI_FRAME_VIEW_H
-#define MPX_GUI_FRAME_VIEW_H
-
-#include <QGraphicsView>
-
-QT_BEGIN_NAMESPACE
-class QGraphicsScene;
-QT_END_NAMESPACE
+#ifndef MPX_BASE_VEC_H
+#define MPX_BASE_VEC_H
 
 namespace mpx {
 
 //-----------------------------------------------------------------------------------------------// 
-// Analysing view of a single frame
-//-----------------------------------------------------------------------------------------------// 
-class FrameView : public QGraphicsView
+
+template<typename T>
+struct Vec3
 {
-    Q_OBJECT
-
-public:
-	FrameView(QWidget* pParent = nullptr);
-
-private:
-	QGraphicsScene* m_pGraphicsScene;
+	T x;
+	T y;
+	T z;
 };
 
 //-----------------------------------------------------------------------------------------------// 

@@ -2,9 +2,13 @@
 // FrameView.cpp
 //-----------------------------------------------------------------------------------------------// 
 #include <QtWidgets>
-#include <GUI/FrameView.qt.h>
+#include <FrameView.qt.h>
+#include <BitStream.h>
+#include <FrameBuf.h>
+#include <Color.h>
+#include <Decode.h>
 
-using namespace mpx::GUI;
+namespace mpx {
 
 //-----------------------------------------------------------------------------------------------// 
 
@@ -14,21 +18,19 @@ FrameView::FrameView(QWidget* pParent)
 	m_pGraphicsScene = new QGraphicsScene();
 	setScene(m_pGraphicsScene);
 
-#if 0
-    QString fileName("S:\\test.png");
-	QImage image(fileName);
-    if(image.isNull())
-	{
-        QMessageBox::information(this, tr("MUH PIXELS"),
-                                    tr("Cannot load %1.").arg(fileName));
-    }
-	else
-	{
-		QPixmap pixmap = QPixmap::fromImage(image);
-		QGraphicsPixmapItem* pPixmapItem = new QGraphicsPixmapItem(pixmap);
-		m_pGraphicsScene->addItem(pPixmapItem);
-	}
+#if 1
+  	BitStreamInfo bsInfo;
+	FrameBuf<RGB8> firstFrame;
+	modelBitStream("C:\\my\\code\\qkepia\\data\\knk-vp9.webm", bsInfo, firstFrame);
+	QImage image(&firstFrame.data()->r, firstFrame.width(), firstFrame.height(), QImage::Format_RGB888);
+	QPixmap pixmap = QPixmap::fromImage(image);
+	QGraphicsPixmapItem* pPixmapItem = new QGraphicsPixmapItem(pixmap);
+	m_pGraphicsScene->addItem(pPixmapItem);
 #endif
 
 	show();
 }
+
+//-----------------------------------------------------------------------------------------------// 
+
+} // mpx

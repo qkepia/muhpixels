@@ -14,7 +14,7 @@ class QScrollArea;
 class QScrollBar;
 QT_END_NAMESPACE
 
-namespace mpx { namespace GUI {
+namespace mpx {
 
 class FrameView;
 class RawFileMap;
@@ -62,7 +62,9 @@ private:
     QMenu* m_pHelpMenu;
 };
 
-}} // mpx::GUI
+//-----------------------------------------------------------------------------------------------// 
+
+} // mpx
 
 //-----------------------------------------------------------------------------------------------// 
 

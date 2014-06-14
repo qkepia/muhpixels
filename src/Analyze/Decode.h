@@ -5,17 +5,21 @@
 #define MPX_ANALYZE_DECODE_H
 
 #include <string>
-#include <Model/BitStream.h>
+#include <FrameBuf.h>
+#include <Color.h>
+#include <BitStream.h>
 
-namespace mpx { namespace Analyze {
-
-//-----------------------------------------------------------------------------------------------// 
-
-void modelBitStream(std::string file, Model::BitStreamInfo& info);
+namespace mpx {
 
 //-----------------------------------------------------------------------------------------------// 
 
-}} // mpx::Analyze
+void modelBitStream(std::string file, 
+					BitStreamInfo& info,
+					FrameBuf<RGB8>& firstFrame);
+
+//-----------------------------------------------------------------------------------------------// 
+
+} // mpx
 
 //-----------------------------------------------------------------------------------------------// 
 

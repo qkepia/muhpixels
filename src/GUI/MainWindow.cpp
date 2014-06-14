@@ -2,13 +2,14 @@
 // MainWindow.cpp
 //-----------------------------------------------------------------------------------------------// 
 #include <QtWidgets>
-#include <GUI/FrameView.qt.h>
-#include <GUI/MainWindow.qt.h>
-#include <GUI/RawFileMap.qt.h>
-#include <Model/BitStream.h>
-#include <Analyze/Decode.h>
+#include <FrameView.qt.h>
+#include <MainWindow.qt.h>
+#include <RawFileMap.qt.h>
+#include <BitStream.h>
+#include <Decode.h>
+#include <Color.h>
 
-using namespace mpx::GUI;
+namespace mpx {
 
 //-----------------------------------------------------------------------------------------------// 
 
@@ -31,8 +32,7 @@ MainWindow::MainWindow()
 	setWindowTitle(tr("MUH PIXELS"));
 	resize(1280, 720);
 
-	Model::BitStreamInfo bsInfo;
-	Analyze::modelBitStream("S:\\my\\data\\knk-vp9.webm", bsInfo);
+
 }
 
 //-----------------------------------------------------------------------------------------------// 
@@ -189,7 +189,6 @@ void MainWindow::scaleImage(double factor)
     m_pZoomOutAct->setEnabled(m_scaleFactor > 0.333);
 }
 
-
 //-----------------------------------------------------------------------------------------------// 
 
 void MainWindow::adjustScrollBar(QScrollBar* scrollBar, double factor)
@@ -197,3 +196,7 @@ void MainWindow::adjustScrollBar(QScrollBar* scrollBar, double factor)
     scrollBar->setValue(int(factor * scrollBar->value()
                             + ((factor - 1) * scrollBar->pageStep()/2)));
 }
+
+//-----------------------------------------------------------------------------------------------// 
+
+} // mpx

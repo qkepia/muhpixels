@@ -2,8 +2,8 @@
 // Decode.cpp
 //-----------------------------------------------------------------------------------------------// 
 
-#include <Analyze/Decode.h>
-#include <Base/Utils.h>
+#include <Decode.h>
+#include <Utils.h>
 
 #include <assert.h>
 #include <stdio.h>
@@ -52,7 +52,7 @@ static const iface_struct ifaces[] =
 
 #pragma warning (disable: 4996)
 
-namespace mpx { namespace Analyze {
+namespace mpx {
 
 class DecodeError : std::exception 
 {
@@ -336,9 +336,12 @@ fail:
 }
 
 
+
 //-----------------------------------------------------------------------------------------------// 
 
-void modelBitStream(std::string file, Model::BitStreamInfo& info)
+void modelBitStream(std::string file, 
+					BitStreamInfo& info,
+					FrameBuf<RGB8>& firstFrame)
 {
 	//vpx_codec_ctx_t        decoder;
 	//char                  *pFileName = NULL;
@@ -460,7 +463,7 @@ void modelBitStream(std::string file, Model::BitStreamInfo& info)
 	int dec_flags = 0;	
 	if(vpx_codec_dec_init(&decoder, pCodecInterface ? pCodecInterface : ifaces[0].iface(), &cfg, dec_flags)) 
 	{
-		throw DecodeError(Base::sprint("Failed to initialize decoder: %s", vpx_codec_error(&decoder)));
+		throw DecodeError(sprint("Failed to initialize decoder: %s", vpx_codec_error(&decoder)));
 	}
 
 	int frame_avail = 1;
@@ -490,7 +493,7 @@ void modelBitStream(std::string file, Model::BitStreamInfo& info)
 
 				if(vpx_codec_decode(&decoder, buf, (unsigned int)buf_sz, NULL, 0)) 
 				{
-					std::string errorString = Base::sprint("Failed to decode frame: %s", vpx_codec_error(&decoder));
+					std::string errorString = sprint("Failed to decode frame: %s", vpx_codec_error(&decoder));
 					const char* pDetail = vpx_codec_error_detail(&decoder);
 					if(pDetail)
 						errorString += std::string(pDetail);
@@ -509,10 +512,62 @@ void modelBitStream(std::string file, Model::BitStreamInfo& info)
 
 		if(vpx_codec_control(&decoder, VP8D_GET_FRAME_CORRUPTED, &corrupted)) 
 		{
-			throw DecodeError(Base::sprint("Failed VP8_GET_FRAME_CORRUPTED: %s", vpx_codec_error(&decoder)));
+			throw DecodeError(sprint("Failed VP8_GET_FRAME_CORRUPTED: %s", vpx_codec_error(&decoder)));
 		}
 
 		frames_corrupted += corrupted;
+
+		if(firstFrame.size() == 0)
+		{
+			if(img->fmt != VPX_IMG_FMT_I420)
+				throw DecodeError("Unsupported image format. Only 4:2:0 allowed.");
+
+			unsigned int c_w = img->x_chroma_shift ? (1 + img->d_w) >> img->x_chroma_shift : img->d_w;
+			unsigned int c_h = img->y_chroma_shift ? (1 + img->d_h) >> img->y_chroma_shift : img->d_h;
+
+			if(c_w * 2 != img->d_w || c_h * 2 != img->d_h)
+				throw DecodeError("Unsupported chroma subsampling format.");
+
+			uint32_t frameWidth = img->d_w;
+			uint32_t frameHeight = img->d_h;
+			firstFrame.setSize(frameWidth, frameHeight);
+
+			int strideY = img->stride[VPX_PLANE_Y];
+			int strideU = img->stride[VPX_PLANE_U];
+			int strideV = img->stride[VPX_PLANE_V];
+
+			for(uint32_t j = 0; j < frameHeight/2; j++)
+			{
+				const uint8_t* pY0 = img->planes[VPX_PLANE_Y] + 2 * j * strideY;
+				const uint8_t* pY1 = pY0 + strideY;
+				const uint8_t* pU = img->planes[VPX_PLANE_U] + j * strideU;
+				const uint8_t* pV = img->planes[VPX_PLANE_V] + j * strideV;
+
+				for(uint32_t i = 0; i < frameWidth/2; i++)
+				{
+					uint8_t ys[4];
+					ys[0] = *pY0++;
+					ys[1] = *pY0++;
+					ys[2] = *pY1++;
+					ys[3] = *pY1++;
+					uint8_t u = *pU++;
+					uint8_t v = *pV++;
+
+					YUV8 yuv0 = { ys[0], u, v };
+					YUV8 yuv1 = { ys[1], u, v };
+					YUV8 yuv2 = { ys[2], u, v };
+					YUV8 yuv3 = { ys[3], u, v };
+					RGB8 rgb0 = toRGB(yuv0);
+					RGB8 rgb1 = toRGB(yuv1);
+					RGB8 rgb2 = toRGB(yuv2);
+					RGB8 rgb3 = toRGB(yuv3);
+					firstFrame(2*i, 2*j) = rgb0;
+					firstFrame(2*i+1, 2*j) = rgb1;
+					firstFrame(2*i, 2*j+1) = rgb2;
+					firstFrame(2*i+1, 2*j+1) = rgb3;
+				}
+			}
+		}
 
 		//// todo: wut if(!noblit) 
 		{
@@ -596,7 +651,7 @@ void modelBitStream(std::string file, Model::BitStreamInfo& info)
 
 	if(vpx_codec_destroy(&decoder)) 
 	{
-		throw DecodeError(Base::sprint("Failed to destroy decoder: %s", vpx_codec_error(&decoder)));
+		throw DecodeError(sprint("Failed to destroy decoder: %s", vpx_codec_error(&decoder)));
 	}
 
 	if(input.nestegg_ctx)
@@ -607,4 +662,4 @@ void modelBitStream(std::string file, Model::BitStreamInfo& info)
 
 //-----------------------------------------------------------------------------------------------// 
 
-}} // mpx::Analyze
+} // mpx
