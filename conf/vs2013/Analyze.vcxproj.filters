@@ -8,6 +8,7 @@
     <ClCompile Include="..\..\external\vpx\libvpx-v1.3.0\nestegg\halloc\src\halloc.c">
       <Filter>nestegg</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Analyze\NesteggUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Analyze\Decode.h" />
@@ -26,6 +27,7 @@
     <ClInclude Include="..\..\external\vpx\libvpx-v1.3.0\nestegg\halloc\src\macros.h">
       <Filter>nestegg</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Analyze\NesteggUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="nestegg">

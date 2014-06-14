@@ -7,9 +7,22 @@
 #include <string>
 #include <FrameBuf.h>
 #include <Color.h>
-#include <BitStream.h>
 
 namespace mpx {
+
+struct BitStreamInfo;
+
+//-----------------------------------------------------------------------------------------------// 
+
+class DecodeError : std::exception 
+{
+public:
+	DecodeError() {}
+	DecodeError(std::string error) : m_error(error) {}
+	const char* what() const { return m_error.c_str(); }
+private:
+	std::string m_error;
+};
 
 //-----------------------------------------------------------------------------------------------// 
 
