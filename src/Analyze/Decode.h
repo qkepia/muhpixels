@@ -16,27 +16,25 @@ namespace mpx {
 class Decoder
 {
 public:
-	class Error : public std::exception 
-	{
-	public:
-		Error() {}
-		Error(std::string error) : m_error(error) {}
-		const char* what() const { return m_error.c_str(); }
-	private:
-		std::string m_error;
-	};
-	
-	Decoder();
-	~Decoder();
-
 	void openFile(std::string file);
 	bool decodeNextFrame();
 	void convertCurrentFrame(FrameBuf<RGB8>& rDestFrame) const;
 
 private:
-	struct VPX;
-	std::unique_ptr<VPX> m_pVPX; // VPX codec pimpl
-	FILE* m_pFile = nullptr;
+	class State;
+	std::unique_ptr<State> m_pState; // pimpl for the decoder state
+};
+
+//-----------------------------------------------------------------------------------------------// 
+
+class DecoderError : public std::exception 
+{
+public:
+	DecoderError() {}
+	DecoderError(std::string error) : m_error(error) {}
+	const char* what() const { return m_error.c_str(); }
+private:
+	std::string m_error;
 };
 
 //-----------------------------------------------------------------------------------------------// 

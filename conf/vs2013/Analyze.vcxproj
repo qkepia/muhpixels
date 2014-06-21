@@ -88,7 +88,6 @@
     <ClCompile Include="..\..\external\vpx\libvpx-v1.3.0\nestegg\halloc\src\halloc.c" />
     <ClCompile Include="..\..\external\vpx\libvpx-v1.3.0\nestegg\src\nestegg.c" />
     <ClCompile Include="..\..\src\Analyze\Decode.cpp" />
-    <ClCompile Include="..\..\src\Analyze\NesteggUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\external\vpx\libvpx-v1.3.0\nestegg\halloc\halloc.h" />
@@ -97,7 +96,6 @@
     <ClInclude Include="..\..\external\vpx\libvpx-v1.3.0\nestegg\halloc\src\macros.h" />
     <ClInclude Include="..\..\external\vpx\libvpx-v1.3.0\nestegg\include\nestegg\nestegg.h" />
     <ClInclude Include="..\..\src\Analyze\Decode.h" />
-    <ClInclude Include="..\..\src\Analyze\NesteggUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\external\vpx\build-vs2013\vpx.vcxproj">

@@ -4,168 +4,257 @@
 
 #include <BitStream.h>
 #include <Decode.h>
-#include <NesteggUtils.h>
 #include <Utils.h>
 #include <nestegg/include/nestegg/nestegg.h>
+#include <stdarg.h>
 #include <vpx/vp8dx.h>
 #include <vpx/vpx_decoder.h>
-
-#define VP9_FOURCC_MASK (0x00395056)
 
 #pragma warning (disable: 4996) // shut up safety warning
 
 namespace mpx {
 
 //-----------------------------------------------------------------------------------------------// 
-
-struct Decoder::VPX
+// Decoder state data for decoding a single file
+//-----------------------------------------------------------------------------------------------// 
+class Decoder::State
 {
+public:
+	std::unique_ptr<vpx_codec_ctx_t> pCodec;
+	FILE* pFile = nullptr;
 	nestegg* pNestegg = nullptr;
-	vpx_codec_ctx_t codecCtx;
-	vpx_image_t* pCurrentFrame = nullptr;
-	input_ctx inputCtx;
+	nestegg_packet* pPacket = nullptr;
+	uint nextChunk = 0;
+	uint chunkCount = 0;
+	uint videoTrackIdx = -1;
+	vpx_image_t* pCurImage = nullptr;
 
-	~VPX()
+	~State()
 	{
-		// shutdown codec and nestegg stream handle
-		if(vpx_codec_destroy(&codecCtx)) 
-			throw Error(sprint("Failed to destroy decoder: %s", vpx_codec_error(&codecCtx)));
-
 		if(pNestegg)
-			nestegg_destroy(pNestegg);
+			nestegg_destroy(pNestegg);		
+
+		if(pFile)
+			fclose(pFile);
+
+		if(pCodec)
+		{
+			vpx_codec_destroy(pCodec.get()); 
+			// todo: throw DecoderError(sprint("Failed to destroy decoder: %s", vpx_codec_error(pCodec)));
+		}
 	}
 };
 
 //-----------------------------------------------------------------------------------------------// 
+// Nestegg callbacks
+//-----------------------------------------------------------------------------------------------// 
 
-Decoder::Decoder()
-	: m_pVPX(std::make_unique<VPX>())
+int nesteggRead(void* pBuf, size_t length, void* pUserdata)
 {
+	FILE* pFile = static_cast<FILE*>(pUserdata);
+
+	if(fread(pBuf, 1, length, pFile) < length) 
+	{
+		if(ferror(pFile))
+			return -1;
+		if(feof(pFile))
+			return 0;
+	}
+	return 1;
 }
 
 //-----------------------------------------------------------------------------------------------// 
 
-Decoder::~Decoder()
+int nesteggSeek(int64_t offset, int origin, void *pUserdata) 
 {
-	if(m_pFile)
+	switch(origin) 
 	{
-		fclose(m_pFile);
-		m_pFile = nullptr;
-	}
+	case NESTEGG_SEEK_SET:
+		origin = SEEK_SET;
+		break;
+	case NESTEGG_SEEK_CUR:
+		origin = SEEK_CUR;
+		break;
+	case NESTEGG_SEEK_END:
+		origin = SEEK_END;
+		break;
+	};
+
+	return fseek(static_cast<FILE*>(pUserdata), long(offset), origin) ? -1 : 0;
+}
+
+//-----------------------------------------------------------------------------------------------// 
+
+int64_t nesteggTell(void *pUserdata) 
+{
+	return ftell(static_cast<FILE*>(pUserdata));
+}
+
+//-----------------------------------------------------------------------------------------------// 
+
+void nesteggLog(nestegg *pNestegg, uint severity, const char* pFormat, ...) 
+{
+	va_list vaList;
+	va_start(vaList, pFormat);
+	vfprintf(stderr, pFormat, vaList);
+	fprintf(stderr, "\n");
+	va_end(vaList);
 }
 
 //-----------------------------------------------------------------------------------------------// 
 
 void Decoder::openFile(std::string file)
-{
-	// close current file, if any, and try to open new one
-	if(m_pFile)
+{	
+	// (re-)initialize state
+	m_pState = std::make_unique<State>();
+	State& rState = *m_pState;
+	
+	// initialize decoder
+	vpx_codec_dec_cfg_t config = { 0 };
+	int flags = 0;
+	rState.pCodec = std::make_unique<vpx_codec_ctx_t>();
+	if(vpx_codec_dec_init(&*rState.pCodec, vpx_codec_vp9_dx(), &config, flags)) 
 	{
-		fclose(m_pFile);
-		m_pFile = nullptr;
+		throw DecoderError(sprint("Failed to initialize decoder: %s", 
+			vpx_codec_error(rState.pCodec.get())));
 	}
 	
+	// try to open file
 	const char* pFileName = file.c_str();
 	if(!pFileName)
-		throw Error("Illegal Filename");
+		throw DecoderError("Illegal Filename");
 
-	m_pFile = fopen(pFileName, "rb");
-	if(!m_pFile)
-		throw Error("Can't open file");
-	
-	// fill input context structure
-	memset(&m_pVPX->inputCtx, 0, sizeof(input_ctx));
+	rState.pFile = fopen(pFileName, "rb");
+	if(!rState.pFile)
+		throw DecoderError("Can't open file");
 		
-	// read first file info stuff
-	m_pVPX->inputCtx.infile = m_pFile;
-	unsigned int fourcc, width, height, fps_den, fps_num;
-	if(file_is_webm(&m_pVPX->inputCtx, &fourcc, &width, &height, &fps_den, &fps_num))
-	{
-		m_pVPX->inputCtx.kind = WEBM_FILE;
-	}
-	else
-	{
-		throw Error("Unrecognized input file type");
-	}
+	// initialize nestegg library
+	nestegg_io io = { nesteggRead, nesteggSeek, nesteggTell, nullptr };		
+	io.userdata = rState.pFile;
+	if(nestegg_init(&rState.pNestegg, io, nullptr))
+		throw DecoderError("Nestegg error: init");
 
-	// check fourcc
-	vpx_codec_iface_t* pCodecInterface = nullptr;
-	if((fourcc & 0x00FFFFFF) !=  VP9_FOURCC_MASK)
-		throw Error("Only VP9 supported");	
-	
-	pCodecInterface = vpx_codec_vp9_dx();
+	// get number of tracks
+	uint trackCount;
+	if(nestegg_track_count(rState.pNestegg, &trackCount))
+		throw DecoderError("Nestegg error: track count");
 
-	// initialize decoder
-	vpx_codec_dec_cfg_t cfg = { 0 };
-	int dec_flags = 0;	
-	if(vpx_codec_dec_init(&m_pVPX->codecCtx, pCodecInterface, &cfg, dec_flags)) 
+	// find the video track
+	uint trackIdx = -1;
+	for(uint i = 0; i < trackCount; i++) 
 	{
-		throw Error(sprint("Failed to initialize decoder: %s", 
-			vpx_codec_error(&m_pVPX->codecCtx)));
+		int trackType = nestegg_track_type(rState.pNestegg, i);
+		if(trackType == NESTEGG_TRACK_VIDEO)
+		{
+			trackIdx = i;
+			break;			
+		}
+		if(trackType < 0)
+			throw DecoderError("Nestegg error: track type");
 	}
+	if(trackIdx == -1)
+		throw DecoderError("No video track found");
+
+	// get the codec for the video track, it should be VP9
+	int codecId = nestegg_track_codec_id(rState.pNestegg, trackIdx);
+	if(codecId != NESTEGG_CODEC_VP9) 
+		throw DecoderError("Codec is not VP9");
+	rState.videoTrackIdx = trackIdx;
 }
 
 //-----------------------------------------------------------------------------------------------// 
 
 bool Decoder::decodeNextFrame()
 {
-	m_pVPX->pCurrentFrame = nullptr;
+	State& rState = *m_pState;
+	rState.pCurImage = nullptr;
 	
-	uint8_t* buf = nullptr;
-	size_t buf_sz = 0;
-	size_t buf_alloc_sz = 0;
-	if(read_frame(&m_pVPX->inputCtx, &buf, &buf_sz, &buf_alloc_sz)) 
+	// get buffer pointer and size for the next frame
+	uint8_t* pBuf = nullptr;
+	size_t bufSize = 0;
 	{
-		// todo: is it ok to return early here?
-		return false;
+		// todo: does this stuff actually work? my testcase only ever has one chunk
+		if(rState.nextChunk >= rState.chunkCount) 
+		{
+			for(;;)
+			{
+				// end of packet, get another
+				if(rState.pPacket)
+					nestegg_free_packet(rState.pPacket);
+
+				// read packet
+				if(nestegg_read_packet(rState.pNestegg, &rState.pPacket) <= 0)
+					return false; // 0 == end of stream, -1 == error
+
+				uint trackIdx;
+				if(nestegg_packet_track(rState.pPacket, &trackIdx) < 0)
+					return false; // -1 == error
+
+				if(trackIdx == rState.videoTrackIdx)
+					break; // track found
+			}
+
+			// get number of chunks
+			if(nestegg_packet_count(rState.pPacket, &rState.chunkCount))
+				return false;
+
+			rState.nextChunk = 0;
+		}
+
+		if(nestegg_packet_data(rState.pPacket, rState.nextChunk, &pBuf, &bufSize))
+			return false;
+
+		rState.nextChunk++;
 	}
 
 	// decode frame
-	if(vpx_codec_decode(&m_pVPX->codecCtx, buf, (unsigned int)buf_sz, nullptr, 0)) 
+	if(vpx_codec_decode(rState.pCodec.get(), pBuf, static_cast<uint>(bufSize), nullptr, 0)) 
 	{
 		std::string errorMsg = sprint("Failed to decode frame: %s", 
-			vpx_codec_error(&m_pVPX->codecCtx));
-		const char* pDetail = vpx_codec_error_detail(&m_pVPX->codecCtx);
+			vpx_codec_error(rState.pCodec.get()));
+		const char* pDetail = vpx_codec_error_detail(rState.pCodec.get());
 		if(pDetail)
 			errorMsg += std::string(pDetail);
-		throw Error(errorMsg);
+		throw DecoderError(errorMsg);
 	}
 
+	// get pointer to the image data buffer
 	vpx_codec_iter_t codecIter = nullptr;
-	m_pVPX->pCurrentFrame = vpx_codec_get_frame(&m_pVPX->codecCtx, &codecIter);
+	rState.pCurImage = vpx_codec_get_frame(rState.pCodec.get(), &codecIter);
 	
 	// check for corruption
 	int corrupted;
-	if(vpx_codec_control(&m_pVPX->codecCtx, VP8D_GET_FRAME_CORRUPTED, &corrupted)) 
+	if(vpx_codec_control(rState.pCodec.get(), VP8D_GET_FRAME_CORRUPTED, &corrupted)) 
 	{
-		throw Error(sprint("Failed VP8_GET_FRAME_CORRUPTED: %s", 
-			vpx_codec_error(&m_pVPX->codecCtx)));
+		throw DecoderError(sprint("Failed VP8_GET_FRAME_CORRUPTED: %s", 
+			vpx_codec_error(rState.pCodec.get())));
 	}
 
-	return m_pVPX->pCurrentFrame != nullptr;
+	return rState.pCurImage != nullptr;
 }
 
 //-----------------------------------------------------------------------------------------------// 
 
 void Decoder::convertCurrentFrame(FrameBuf<RGB8>& rDestFrame) const
 {
-	if(!m_pVPX->pCurrentFrame)
-	{
+	State& rState = *m_pState;
+	if(!rState.pCurImage)
 		return; // no frame available
-	}
 
-	const vpx_image_t& srcImage = *m_pVPX->pCurrentFrame;
+	// Convert from 4:2:0 subsampled YCbCr data to a buffer of RGB pixels.
+	// No other formats are supported. (does VP9 even have others?)
+	const vpx_image_t& srcImage = *rState.pCurImage;
 
 	if(srcImage.fmt != VPX_IMG_FMT_I420)
-		throw Decoder::Error("Unsupported image format. Only 4:2:0 allowed.");
+		throw DecoderError("Unsupported image format. Only 4:2:0 allowed");
 
-	unsigned int c_w = srcImage.x_chroma_shift ? (1 + srcImage.d_w) >> srcImage.x_chroma_shift 
-											   : srcImage.d_w;
-	unsigned int c_h = srcImage.y_chroma_shift ? (1 + srcImage.d_h) >> srcImage.y_chroma_shift 
-											   : srcImage.d_h;
+	uint c_w = srcImage.x_chroma_shift ? (1 + srcImage.d_w) >> srcImage.x_chroma_shift 
+									   : srcImage.d_w;
+	uint c_h = srcImage.y_chroma_shift ? (1 + srcImage.d_h) >> srcImage.y_chroma_shift 
+									   : srcImage.d_h;
 
 	if(c_w * 2 != srcImage.d_w || c_h * 2 != srcImage.d_h)
-		throw Decoder::Error("Unsupported chroma subsampling format.");
+		throw DecoderError("Unsupported chroma subsampling format");
 
 	uint32_t frameWidth = srcImage.d_w;
 	uint32_t frameHeight = srcImage.d_h;
