@@ -4,45 +4,44 @@
 #ifndef MPX_ANALYZE_DECODE_H
 #define MPX_ANALYZE_DECODE_H
 
-#include <string>
-#include <FrameBuf.h>
 #include <Color.h>
+#include <FrameBuf.h>
 #include <memory>
-
-#include <vpx/vpx_decoder.h>
-#include "nestegg/include/nestegg/nestegg.h"
+#include <string>
 
 namespace mpx {
-
-struct BitStreamInfo;
 
 //-----------------------------------------------------------------------------------------------// 
 
 class Decoder
 {
 public:
+	class Error : public std::exception 
+	{
+	public:
+		Error() {}
+		Error(std::string error) : m_error(error) {}
+		const char* what() const { return m_error.c_str(); }
+	private:
+		std::string m_error;
+	};
+	
+	Decoder();
+	~Decoder();
+
 	void openFile(std::string file);
-	vpx_image_t* getNextFrame();
-	void convertFrame(FrameBuf<RGB8>& rDestFrame, const vpx_image_t& rSrcImage);
+	bool decodeNextFrame();
+	void convertCurrentFrame(FrameBuf<RGB8>& rDestFrame) const;
 
 private:
-	std::shared_ptr<nestegg> m_pNestegg;
-	std::shared_ptr<vpx_codec_ctx_t> m_pCodecContext;
+	struct VPX;
+	std::unique_ptr<VPX> m_pVPX; // VPX codec pimpl
+	FILE* m_pFile = nullptr;
 };
 
 //-----------------------------------------------------------------------------------------------// 
 
-class DecoderError : std::exception 
-{
-public:
-	DecoderError() {}
-	DecoderError(std::string error) : m_error(error) {}
-	const char* what() const { return m_error.c_str(); }
-private:
-	std::string m_error;
-};
-
-//-----------------------------------------------------------------------------------------------// 
+struct BitStreamInfo;
 
 void modelBitStream(std::string file, 
 					BitStreamInfo& info,

@@ -2,12 +2,13 @@
 // Decode.cpp
 //-----------------------------------------------------------------------------------------------// 
 
-#include <Decode.h>
-#include <Utils.h>
 #include <BitStream.h>
+#include <Decode.h>
 #include <NesteggUtils.h>
-#include <vpx/vpx_decoder.h>
+#include <Utils.h>
+#include <nestegg/include/nestegg/nestegg.h>
 #include <vpx/vp8dx.h>
+#include <vpx/vpx_decoder.h>
 
 #define VP9_FOURCC_MASK (0x00395056)
 
@@ -17,208 +18,169 @@ namespace mpx {
 
 //-----------------------------------------------------------------------------------------------// 
 
-void modelBitStream(std::string file, 
-					BitStreamInfo& info,
-					FrameBuf<RGB8>& firstFrame)
+struct Decoder::VPX
 {
-	Decoder decoder;
-	decoder.openFile(file);
-	int frameIdx = 0;
-	vpx_image_t* pVpxImage = nullptr;
-	for(; pVpxImage = decoder.getNextFrame(); frameIdx++)
+	nestegg* pNestegg = nullptr;
+	vpx_codec_ctx_t codecCtx;
+	vpx_image_t* pCurrentFrame = nullptr;
+	input_ctx inputCtx;
+
+	~VPX()
 	{
-		if(firstFrame.size() == 0)
-		{
-			decoder.convertFrame(firstFrame, *pVpxImage);
-		}
+		// shutdown codec and nestegg stream handle
+		if(vpx_codec_destroy(&codecCtx)) 
+			throw Error(sprint("Failed to destroy decoder: %s", vpx_codec_error(&codecCtx)));
+
+		if(pNestegg)
+			nestegg_destroy(pNestegg);
 	}
+};
 
+//-----------------------------------------------------------------------------------------------// 
 
-#if 0
-	// try to open file
-	const char* pFileName = file.c_str();
-	if(!pFileName)
-		throw DecoderError("Illegal Filename");
+Decoder::Decoder()
+	: m_pVPX(std::make_unique<VPX>())
+{
+}
 
-	FILE* pInFile = fopen(pFileName, "rb");
-	if(!pInFile)
-		throw DecoderError("Can't open file");
-	
-	// fill input context structure
-	input_ctx input;
-	memset(&input, 0, sizeof(input_ctx));
-		
-	// read first file info stuff
-	input.infile = pInFile;
-	unsigned int fourcc, width, height, fps_den, fps_num;
-	if(file_is_webm(&input, &fourcc, &width, &height, &fps_den, &fps_num))
+//-----------------------------------------------------------------------------------------------// 
+
+Decoder::~Decoder()
+{
+	if(m_pFile)
 	{
-		input.kind = WEBM_FILE;
+		fclose(m_pFile);
+		m_pFile = nullptr;
 	}
-	else
-	{
-		throw DecoderError("Unrecognized input file type");
-	}
-
-	// check fourcc
-	vpx_codec_iface_t* pCodecInterface = nullptr;
-	if((fourcc & 0x00FFFFFF) !=  VP9_FOURCC_MASK)
-		throw DecoderError("Only VP9 supported");
-	
-	pCodecInterface = vpx_codec_vp9_dx();
-
-	vpx_codec_ctx_t decoder;
-	vpx_codec_dec_cfg_t cfg = { 0 };
-	int dec_flags = 0;	
-	if(vpx_codec_dec_init(&decoder, pCodecInterface, &cfg, dec_flags)) 
-	{
-		throw DecoderError(sprint("Failed to initialize decoder: %s", vpx_codec_error(&decoder)));
-	}
-
-	int frame_avail = 1;
-	int got_data = 0;
-
-	// decode file
-	int frame_in = 0;
-	int frame_out = 0;
-	int frames_corrupted = 0;
-	while(frame_avail || got_data) 
-	{
-		vpx_codec_iter_t iter = NULL;
-		vpx_image_t* img;
-		int corrupted;
-
-		frame_avail = 0;
-		int stop_after = 0;
-		
-		if(!stop_after || frame_in < stop_after) 
-		{
-			uint8_t* buf = NULL;
-			size_t buf_sz = 0, buf_alloc_sz = 0;
-			if(!read_frame(&input, &buf, &buf_sz, &buf_alloc_sz)) 
-			{
-				frame_avail = 1;
-				frame_in++;
-
-				if(vpx_codec_decode(&decoder, buf, (unsigned int)buf_sz, NULL, 0)) 
-				{
-					std::string errorString = sprint("Failed to decode frame: %s", vpx_codec_error(&decoder));
-					const char* pDetail = vpx_codec_error_detail(&decoder);
-					if(pDetail)
-						errorString += std::string(pDetail);
-
-					throw DecoderError(errorString);
-				}
-			}
-		}
-
-		got_data = 0;
-		if((img = vpx_codec_get_frame(&decoder, &iter))) 
-		{
-			++frame_out;
-			got_data = 1;
-		}
-
-		if(vpx_codec_control(&decoder, VP8D_GET_FRAME_CORRUPTED, &corrupted)) 
-		{
-			throw DecoderError(sprint("Failed VP8_GET_FRAME_CORRUPTED: %s", vpx_codec_error(&decoder)));
-		}
-
-		frames_corrupted += corrupted;
-
-		if(stop_after && frame_in >= stop_after)
-			break;
-	}
-
-	if(frames_corrupted)
-		fprintf(stderr, "WARNING: %d frames corrupted.\n", frames_corrupted);
-
-	// todo: RAIIIIII
-	if(vpx_codec_destroy(&decoder)) 
-	{
-		throw DecoderError(sprint("Failed to destroy decoder: %s", vpx_codec_error(&decoder)));
-	}
-
-	if(input.nestegg_ctx)
-		nestegg_destroy(input.nestegg_ctx);
-
-	fclose(pInFile);
-#endif
 }
 
 //-----------------------------------------------------------------------------------------------// 
 
 void Decoder::openFile(std::string file)
 {
-	// try to open file
+	// close current file, if any, and try to open new one
+	if(m_pFile)
+	{
+		fclose(m_pFile);
+		m_pFile = nullptr;
+	}
+	
 	const char* pFileName = file.c_str();
 	if(!pFileName)
-		throw DecoderError("Illegal Filename");
+		throw Error("Illegal Filename");
 
-	FILE* pInFile = fopen(pFileName, "rb");
-	if(!pInFile)
-		throw DecoderError("Can't open file");
+	m_pFile = fopen(pFileName, "rb");
+	if(!m_pFile)
+		throw Error("Can't open file");
 	
 	// fill input context structure
-	input_ctx input;
-	memset(&input, 0, sizeof(input_ctx));
+	memset(&m_pVPX->inputCtx, 0, sizeof(input_ctx));
 		
 	// read first file info stuff
-	input.infile = pInFile;
+	m_pVPX->inputCtx.infile = m_pFile;
 	unsigned int fourcc, width, height, fps_den, fps_num;
-	if(file_is_webm(&input, &fourcc, &width, &height, &fps_den, &fps_num))
+	if(file_is_webm(&m_pVPX->inputCtx, &fourcc, &width, &height, &fps_den, &fps_num))
 	{
-		input.kind = WEBM_FILE;
+		m_pVPX->inputCtx.kind = WEBM_FILE;
 	}
 	else
 	{
-		throw DecoderError("Unrecognized input file type");
+		throw Error("Unrecognized input file type");
 	}
 
 	// check fourcc
 	vpx_codec_iface_t* pCodecInterface = nullptr;
 	if((fourcc & 0x00FFFFFF) !=  VP9_FOURCC_MASK)
-		throw DecoderError("Only VP9 supported");	
+		throw Error("Only VP9 supported");	
 	
 	pCodecInterface = vpx_codec_vp9_dx();
 
-	//vpx_codec_ctx_t decoder;
-	m_pCodecContext = std::make_shared<vpx_codec_ctx_t>();
+	// initialize decoder
 	vpx_codec_dec_cfg_t cfg = { 0 };
 	int dec_flags = 0;	
-	if(vpx_codec_dec_init(&*m_pCodecContext, pCodecInterface, &cfg, dec_flags)) 
+	if(vpx_codec_dec_init(&m_pVPX->codecCtx, pCodecInterface, &cfg, dec_flags)) 
 	{
-		throw DecoderError(sprint("Failed to initialize decoder: %s", vpx_codec_error(&*m_pCodecContext)));
+		throw Error(sprint("Failed to initialize decoder: %s", 
+			vpx_codec_error(&m_pVPX->codecCtx)));
 	}
 }
 
 //-----------------------------------------------------------------------------------------------// 
 
-void Decoder::convertFrame(FrameBuf<RGB8>& rDestFrame, const vpx_image_t& rSrcImage)
+bool Decoder::decodeNextFrame()
 {
-	if(rSrcImage.fmt != VPX_IMG_FMT_I420)
-		throw DecoderError("Unsupported image format. Only 4:2:0 allowed.");
+	m_pVPX->pCurrentFrame = nullptr;
+	
+	uint8_t* buf = nullptr;
+	size_t buf_sz = 0;
+	size_t buf_alloc_sz = 0;
+	if(read_frame(&m_pVPX->inputCtx, &buf, &buf_sz, &buf_alloc_sz)) 
+	{
+		// todo: is it ok to return early here?
+		return false;
+	}
 
-	unsigned int c_w = rSrcImage.x_chroma_shift ? (1 + rSrcImage.d_w) >> rSrcImage.x_chroma_shift : rSrcImage.d_w;
-	unsigned int c_h = rSrcImage.y_chroma_shift ? (1 + rSrcImage.d_h) >> rSrcImage.y_chroma_shift : rSrcImage.d_h;
+	// decode frame
+	if(vpx_codec_decode(&m_pVPX->codecCtx, buf, (unsigned int)buf_sz, nullptr, 0)) 
+	{
+		std::string errorMsg = sprint("Failed to decode frame: %s", 
+			vpx_codec_error(&m_pVPX->codecCtx));
+		const char* pDetail = vpx_codec_error_detail(&m_pVPX->codecCtx);
+		if(pDetail)
+			errorMsg += std::string(pDetail);
+		throw Error(errorMsg);
+	}
 
-	if(c_w * 2 != rSrcImage.d_w || c_h * 2 != rSrcImage.d_h)
-		throw DecoderError("Unsupported chroma subsampling format.");
+	vpx_codec_iter_t codecIter = nullptr;
+	m_pVPX->pCurrentFrame = vpx_codec_get_frame(&m_pVPX->codecCtx, &codecIter);
+	
+	// check for corruption
+	int corrupted;
+	if(vpx_codec_control(&m_pVPX->codecCtx, VP8D_GET_FRAME_CORRUPTED, &corrupted)) 
+	{
+		throw Error(sprint("Failed VP8_GET_FRAME_CORRUPTED: %s", 
+			vpx_codec_error(&m_pVPX->codecCtx)));
+	}
 
-	uint32_t frameWidth = rSrcImage.d_w;
-	uint32_t frameHeight = rSrcImage.d_h;
+	return m_pVPX->pCurrentFrame != nullptr;
+}
+
+//-----------------------------------------------------------------------------------------------// 
+
+void Decoder::convertCurrentFrame(FrameBuf<RGB8>& rDestFrame) const
+{
+	if(!m_pVPX->pCurrentFrame)
+	{
+		return; // no frame available
+	}
+
+	const vpx_image_t& srcImage = *m_pVPX->pCurrentFrame;
+
+	if(srcImage.fmt != VPX_IMG_FMT_I420)
+		throw Decoder::Error("Unsupported image format. Only 4:2:0 allowed.");
+
+	unsigned int c_w = srcImage.x_chroma_shift ? (1 + srcImage.d_w) >> srcImage.x_chroma_shift 
+											   : srcImage.d_w;
+	unsigned int c_h = srcImage.y_chroma_shift ? (1 + srcImage.d_h) >> srcImage.y_chroma_shift 
+											   : srcImage.d_h;
+
+	if(c_w * 2 != srcImage.d_w || c_h * 2 != srcImage.d_h)
+		throw Decoder::Error("Unsupported chroma subsampling format.");
+
+	uint32_t frameWidth = srcImage.d_w;
+	uint32_t frameHeight = srcImage.d_h;
 	rDestFrame.setSize(frameWidth, frameHeight);
 
-	int strideY = rSrcImage.stride[VPX_PLANE_Y];
-	int strideU = rSrcImage.stride[VPX_PLANE_U];
-	int strideV = rSrcImage.stride[VPX_PLANE_V];
+	int strideY = srcImage.stride[VPX_PLANE_Y];
+	int strideU = srcImage.stride[VPX_PLANE_U];
+	int strideV = srcImage.stride[VPX_PLANE_V];
 
 	for(uint32_t j = 0; j < frameHeight/2; j++)
 	{
-		const uint8_t* pY0 = rSrcImage.planes[VPX_PLANE_Y] + 2 * j * strideY;
+		const uint8_t* pY0 = srcImage.planes[VPX_PLANE_Y] + 2 * j * strideY;
 		const uint8_t* pY1 = pY0 + strideY;
-		const uint8_t* pU = rSrcImage.planes[VPX_PLANE_U] + j * strideU;
-		const uint8_t* pV = rSrcImage.planes[VPX_PLANE_V] + j * strideV;
+		const uint8_t* pU = srcImage.planes[VPX_PLANE_U] + j * strideU;
+		const uint8_t* pV = srcImage.planes[VPX_PLANE_V] + j * strideV;
 
 		for(uint32_t i = 0; i < frameWidth/2; i++)
 		{
@@ -246,6 +208,23 @@ void Decoder::convertFrame(FrameBuf<RGB8>& rDestFrame, const vpx_image_t& rSrcIm
 	}
 }
 
+//-----------------------------------------------------------------------------------------------// 
+
+void modelBitStream(std::string file, 
+					BitStreamInfo& info,
+					FrameBuf<RGB8>& firstFrame)
+{
+	Decoder decoder;
+	decoder.openFile(file);
+	int iFrame = 0;
+	for(; decoder.decodeNextFrame(); iFrame++)
+	{
+		if(firstFrame.size() == 0)
+		{
+			decoder.convertCurrentFrame(firstFrame);
+		}
+	}
+}
 
 //-----------------------------------------------------------------------------------------------// 
 

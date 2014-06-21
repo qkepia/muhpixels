@@ -1,13 +1,13 @@
 //-----------------------------------------------------------------------------------------------// 
 // MainWindow.cpp
 //-----------------------------------------------------------------------------------------------// 
-#include <QtWidgets>
+#include <BitStream.h>
+#include <Color.h>
+#include <Decode.h>
 #include <FrameView.qt.h>
 #include <MainWindow.qt.h>
+#include <QtWidgets>
 #include <RawFileMap.qt.h>
-#include <BitStream.h>
-#include <Decode.h>
-#include <Color.h>
 
 namespace mpx {
 
@@ -31,8 +31,6 @@ MainWindow::MainWindow()
 
 	setWindowTitle(tr("MUH PIXELS"));
 	resize(1280, 720);
-
-
 }
 
 //-----------------------------------------------------------------------------------------------// 
