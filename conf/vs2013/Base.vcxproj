@@ -89,6 +89,7 @@
     <ClInclude Include="..\..\src\Base\FrameBuf.h" />
     <ClInclude Include="..\..\src\Base\Include.h" />
     <ClInclude Include="..\..\src\Base\Color.h" />
+    <ClInclude Include="..\..\src\Base\Range.h" />
     <ClInclude Include="..\..\src\Base\Utils.h" />
     <ClInclude Include="..\..\src\Base\Vec.h" />
   </ItemGroup>

@@ -42,7 +42,7 @@ private:
 struct BitStreamInfo;
 
 void modelBitStream(std::string file, 
-					BitStreamInfo& info,
+					BitStream& info,
 					FrameBuf<RGB8>& firstFrame);
 
 //-----------------------------------------------------------------------------------------------// 

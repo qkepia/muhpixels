@@ -19,9 +19,10 @@ FrameView::FrameView(QWidget* pParent)
 	setScene(m_pGraphicsScene);
 
 #if 1
-  	BitStreamInfo bsInfo;
+  	BitStream bsInfo;
 	FrameBuf<RGB8> firstFrame;
-	modelBitStream("S:\\my\\data\\knk-vp9.webm", bsInfo, firstFrame);
+	//modelBitStream("S:\\my\\data\\knk.webm", bsInfo, firstFrame);
+	modelBitStream("S:\\my\\data\\rgs-op.webm", bsInfo, firstFrame);
 	QImage image(&firstFrame.data()->r, firstFrame.width(), firstFrame.height(), QImage::Format_RGB888);
 	QPixmap pixmap = QPixmap::fromImage(image);
 	QGraphicsPixmapItem* pPixmapItem = new QGraphicsPixmapItem(pixmap);

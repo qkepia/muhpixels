@@ -300,7 +300,7 @@ void Decoder::convertCurrentFrame(FrameBuf<RGB8>& rDestFrame) const
 //-----------------------------------------------------------------------------------------------// 
 
 void modelBitStream(std::string file, 
-					BitStreamInfo& info,
+					BitStream& info,
 					FrameBuf<RGB8>& firstFrame)
 {
 	Decoder decoder;

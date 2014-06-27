@@ -4,13 +4,32 @@
 #ifndef MPX_MODEL_BIT_STREAM_H
 #define MPX_MODEL_BIT_STREAM_H
 
+#include <Range.h>
+#include <vector>
+
 namespace mpx {
 
 //-----------------------------------------------------------------------------------------------// 
 // Bitstream infos.
 //-----------------------------------------------------------------------------------------------// 
-struct BitStreamInfo
+struct BitStream
 {
+	struct Chunk
+	{
+		uint chunkIdx;
+		uint packetIdx;		
+		RangeU64 range;
+	};
+
+	struct Packet
+	{
+		uint64_t packetIdx;
+		uint trackIdx;
+		std::vector<Chunk> chunks;
+		RangeU64 range;
+	};
+
+	std::vector<Packet> packets;
 };
 
 //-----------------------------------------------------------------------------------------------// 
